@@ -17,13 +17,13 @@ class Breaker(object):
   def transform(self, sequence):
     seq = Sequence(sequence.text)
     seq.idx = [0]
-    for segment in sequence:
+    for _, segment in sequence:
       offset = seq.idx[-1]
       self.breaker.setText(segment)
       seq.idx.extend([offset+x for x in self.breaker])
     return seq
 
- 
+
 class SentenceTokenizer(Breaker):
   """ Segment text to sentences. """
 

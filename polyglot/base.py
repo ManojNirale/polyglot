@@ -35,12 +35,12 @@ class Sequence(object):
 
   def __iter__(self):
     for start, end in zip(self.idx[:-1], self.idx[1:]):
-      yield self.text[start: end]
+      yield start, self.text[start: end]
 
   def tokens(self):
     """ Returns segmented text after stripping whitespace."""
 
-    return [x.strip() for x in self if x.strip()]
+    return [(start, x.strip()) for start, x in self if x.strip()]
 
   def __str__(self):
     if six.PY3:

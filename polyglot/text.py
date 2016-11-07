@@ -260,24 +260,21 @@ class Word(unicode):
   translation, and WordNet integration.
   """
 
-  def __new__(cls, string, language=None, pos_tag=None):
+  def __new__(cls, string_offset, language=None, pos_tag=None):
     """Return a new instance of the class. It is necessary to override
     this method in order to handle the extra pos_tag argument in the
     constructor.
     """
+    _, string = string_offset
     return super(Word, cls).__new__(cls, string)
 
-  def __init__(self, string, language=None, pos_tag=None):
-    self.string = string
+  def __init__(self, string_offset, language=None, pos_tag=None):
+    self.offset, self.string = string_offset
     self.pos_tag = pos_tag
     self.__lang = language
 
-  def __repr__(self):
-      return repr(self.string)
-
   def __str__(self):
     return self.string
-
 
   @cached_property
   def morpheme_analyzer(self):
@@ -337,7 +334,7 @@ class WordList(list):
     """Initialize a WordList. Takes a collection of strings as
     its only argument.
     """
-    self._collection = [Word(w, language=language) for w in collection]
+    self._collection = [Word((o, w), language=language) for o, w in collection]
     self.parent = parent
     super(WordList, self).__init__(self._collection)
 
@@ -358,7 +355,10 @@ class WordList(list):
 
   def __getslice__(self, i, j):
     # This is included for Python 2.* compatibility
-    return self.__class__(self._collection[i:j])
+    collection = []
+    for x in range(i, j):
+      collection.append((self._collection[x].offset, self._collection[x].string))
+    return self.__class__(collection)
 
   def __iter__(self):
     return iter(self._collection)
@@ -412,7 +412,7 @@ class Chunk(WordList):
 
   def __init__(self, subsequence, start_index=0, end_index=None, tag="",
                parent=None):
-    super(Chunk, self).__init__(collection=subsequence, parent=parent)
+    super(Chunk, self).__init__(collection=[(sub.offset, sub.string) for sub in subsequence], parent=parent)
     #: The start index within a Text
     self.start = start_index
     #: The end index within a Text
