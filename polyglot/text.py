@@ -349,9 +349,12 @@ class WordList(list):
   def __getitem__(self, key):
     """Returns a string at the given index."""
     if isinstance(key, slice):
-        return self.__class__(self._collection[key])
+        collection = []
+        for word in self._collection[key]:
+          collection.append((word.offset, word.string))
+        return self.__class__(collection)
     else:
-        return self._collection[key]
+        return Word((self._collection[key].offset, self._collection[key].string))
 
   def __getslice__(self, i, j):
     # This is included for Python 2.* compatibility
