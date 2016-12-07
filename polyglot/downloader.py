@@ -85,6 +85,7 @@ from collections import defaultdict
 import logging
 from os import path
 from json import loads
+import urllib2
 
 
 from polyglot import polyglot_path
@@ -361,7 +362,7 @@ class Downloader(object):
      So set the following DEFAULT_URL properly.
   """
 
-  DEFAULT_URL = 'http://polyglot.cs.stonybrook.edu/~polyglot/' 
+  DEFAULT_URL = 'http://polyglot.cs.stonybrook.edu/~polyglot/'
   """The default URL for the Polyglot data server's index.  An
      alternative URL can be specified when creating a new
      ``Downloader`` object.
@@ -828,8 +829,12 @@ class Downloader(object):
         data = r1.read()
     elif source == 'mirror':
         index_url = path.join(self._url, 'index.json')
-        data = urlopen(index_url).read()
-
+        try:
+          data = urlopen(index_url).read()
+        except urllib2.URLError:
+          logger.warning('Could not open url.')
+          return
+          
     if six.PY3:
       data = data.decode('utf-8')
     data = loads(data)
