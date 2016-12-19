@@ -85,8 +85,6 @@ from collections import defaultdict
 import logging
 from os import path
 from json import loads
-import urllib2
-
 
 from polyglot import polyglot_path
 from polyglot.detect.langids import isoLangs
@@ -831,10 +829,10 @@ class Downloader(object):
         index_url = path.join(self._url, 'index.json')
         try:
           data = urlopen(index_url).read()
-        except urllib2.URLError:
+        except URLError:
           logger.warning('Could not open url.')
           return
-          
+
     if six.PY3:
       data = data.decode('utf-8')
     data = loads(data)
